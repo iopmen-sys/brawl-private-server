@@ -1,0 +1,41 @@
+import random
+from dataclasses import dataclass, field
+
+
+@dataclass
+class UpdateConfig:
+    season_name: str = "Season 32: Cyber Arena"
+    bonus_event: str = "Double Trophies & Coin Shower"
+    shop_offers: list[dict] = field(
+        default_factory=lambda: [
+            {"id": "offer_1", "title": "Mega Box Pack", "cost_gems": 79, "boxes": 3},
+            {"id": "offer_2", "title": "Coin Boost", "cost_gems": 29, "coins": 500},
+        ]
+    )
+    box_loot_table: list[tuple[str, int, int]] = field(
+        default_factory=lambda: [
+            ("coins", 100, 50),
+            ("power_points", 75, 35),
+            ("gems", 10, 12),
+            ("brawler_unlock:Shelly", 1, 3),
+        ]
+    )
+
+
+def open_box(config: UpdateConfig) -> dict:
+    rewards = []
+    drops_count = random.randint(2, 4)
+
+    for _ in range(drops_count):
+        item, amount, weight = random.choices(
+            config.box_loot_table,
+            weights=[row[2] for row in config.box_loot_table],
+            k=1,
+        )[0]
+        rewards.append({"item": item, "amount": amount})
+
+    return {
+        "season": config.season_name,
+        "event": config.bonus_event,
+        "rewards": rewards,
+    }
